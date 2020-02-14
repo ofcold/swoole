@@ -1,0 +1,68 @@
+{
+	"name": "ofcold/http-swoole",
+	"description": "High performance HTTP server based on Swoole. Speed up your Laravel and Lumen applications.",
+	"keywords": [
+		"swoole",
+		"laravel",
+		"lumen",
+		"performance",
+		"http",
+		"server"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Bill Li",
+			"email": "bill.li@ofcold.com"
+		}
+	],
+	"require": {
+		"php": "^7.2",
+		"illuminate/console": "~6.0",
+		"illuminate/contracts": "~6.0",
+		"illuminate/http": "~6.0",
+		"illuminate/support": "~6.0"
+	},
+	"require-dev": {
+		"laravel/lumen-framework": "~5.4|~6.0",
+		"phpunit/phpunit": "^7.5",
+		"phpunit/php-code-coverage": "^6.1",
+		"php-coveralls/php-coveralls": "^2.1",
+		"mockery/mockery": "~1.0",
+		"codedungeon/phpunit-result-printer": "^0.14.0",
+		"php-mock/php-mock": "^2.0",
+		"swoole/ide-helper": "@dev"
+	},
+	"autoload": {
+		"files": [
+			"src/Server/helpers.php"
+		],
+		"psr-4": {
+			"Ofcold\\HttpSwoole\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Ofcold\\HttpSwoole\\Tests\\": "tests",
+			"Ofcold\\HttpSwoole\\Tests\\Fixtures\\Laravel\\App\\": "tests/fixtures/laravel/app"
+		}
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Ofcold\\HttpSwoole\\LaravelServiceProvider"
+			],
+			"aliases": {
+				"Server": "Ofcold\\HttpSwoole\\Server\\Facades\\Server",
+				"Table": "Ofcold\\HttpSwoole\\Server\\Facades\\Table",
+				"Room": "Ofcold\\HttpSwoole\\Websocket\\Facades\\Room",
+				"Websocket": "Ofcold\\HttpSwoole\\Websocket\\Facades\\Websocket"
+			}
+		}
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"@php copy_versioned_files.php"
+		]
+	}
+}
