@@ -3,7 +3,7 @@
 namespace Ofcold\HttpSwoole\Websocket\Rooms;
 
 use Illuminate\Support\Arr;
-use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Support\Facades\Redis;
 
 class RedisRoom implements RoomContract
 {
@@ -15,19 +15,11 @@ class RedisRoom implements RoomContract
     public $redis;
 
 	/**
-	 * @var array
-	 */
-	protected $config;
-
-	/**
 	 * RedisRoom constructor.
-	 *
-	 * @param array $config
 	 */
-	public function __construct(array $config, RedisFactory $redis)
+	public function __construct()
 	{
-		$this->config = $config;
-		$this->redis = $redis;
+		$this->redis = $this->connection();
 	}
 
 	/**
@@ -47,7 +39,7 @@ class RedisRoom implements RoomContract
 	 */
 	public function getRedis()
 	{
-		return $this->connection();
+		return $this->redis;
 	}
 
 	/**
@@ -99,7 +91,7 @@ class RedisRoom implements RoomContract
 		$this->checkTable($table);
 		$redisKey = $this->getKey($key, $table);
 
-		$this->connection()->pipeline(function ($pipe) use ($redisKey, $values) {
+		$this->redis->pipeline(function ($pipe) use ($redisKey, $values) {
 			foreach ($values as $value) {
 				$pipe->sadd($redisKey, $value);
 			}
@@ -122,7 +114,7 @@ class RedisRoom implements RoomContract
 		$this->checkTable($table);
 		$redisKey = $this->getKey($key, $table);
 
-		$this->connection()->pipeline(function ($pipe) use ($redisKey, $values) {
+		$this->redis->pipeline(function ($pipe) use ($redisKey, $values) {
 			foreach ($values as $value) {
 				$pipe->srem($redisKey, $value);
 			}
@@ -179,7 +171,7 @@ class RedisRoom implements RoomContract
 	{
 		$this->checkTable($table);
 
-		$result = $this->connection()->smembers($this->getKey($key, $table));
+		$result = $this->redis->smembers($this->getKey($key, $table));
 
 		// Try to fix occasional non-array returned result
 		return is_array($result) ? $result : [];
@@ -203,8 +195,8 @@ class RedisRoom implements RoomContract
 	 */
 	protected function cleanRooms(): void
 	{
-		if (count($keys = $this->connection()->keys("*"))) {
-			$this->connection()->del($keys);
+		if (count($keys = $this->redis->keys("*"))) {
+			$this->redis->del($keys);
 		}
 	}
 
@@ -215,6 +207,6 @@ class RedisRoom implements RoomContract
 	 */
 	public function connection()
 	{
-		return $this->redis->connection('swoole');
+		return Redis::connection('swoole');
 	}
 }
